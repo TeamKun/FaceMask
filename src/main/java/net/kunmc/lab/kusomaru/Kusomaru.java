@@ -102,7 +102,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
             case 2:
                 return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
             case 3:
-                if (args[2].equalsIgnoreCase("set")) {
+                if (args[0].equalsIgnoreCase("set")) {
                     return Arrays.stream(Face.values()).map(x -> x.label).filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
                 }
             default:
