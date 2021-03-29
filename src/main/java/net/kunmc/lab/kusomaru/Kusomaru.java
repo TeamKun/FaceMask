@@ -43,6 +43,14 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        for (UUID uuid : wearers.keySet()) {
+            Player p = Bukkit.getPlayer(uuid);
+            if (p == null) continue;
+            ItemStack[] armors = p.getInventory().getArmorContents();
+            armors[3] = new ItemStack(Material.AIR);
+            p.getInventory().setArmorContents(armors);
+            wearers.remove(p.getUniqueId());
+        }
     }
 
     @Override
@@ -55,9 +63,9 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
 
-                Player p = Bukkit.getPlayer(args[1]);
-                if (p == null) {
-                    sender.sendMessage(ChatColor.RED + args[1] + "は存在しません.");
+                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player)x)).collect(Collectors.toList());
+                if (players.isEmpty()) {
+                    sender.sendMessage(ChatColor.RED + "変更対象は存在しません.");
                     break;
                 }
 
@@ -67,11 +75,13 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
                 Face item = Face.valueOf(facename);
-                ItemStack[] armors = p.getInventory().getArmorContents();
-                armors[3] = new ItemStack(item.material);
-                ;
-                p.getInventory().setArmorContents(armors);
-                wearers.put(p.getUniqueId(), item);
+                for (Player p : players) {
+                    ItemStack[] armors = p.getInventory().getArmorContents();
+                    armors[3] = new ItemStack(item.material);
+                    ;
+                    p.getInventory().setArmorContents(armors);
+                    wearers.put(p.getUniqueId(), item);
+                }
                 break;
             }
             case "unset": {
@@ -80,15 +90,18 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
 
-                Player p = Bukkit.getPlayer(args[1]);
-                if (p == null) {
-                    sender.sendMessage(ChatColor.RED + args[1] + "は存在しません.");
+                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player)x)).collect(Collectors.toList());
+                if (players.isEmpty()) {
+                    sender.sendMessage(ChatColor.RED + "変更対象は存在しません.");
                     break;
                 }
-                ItemStack[] armors = p.getInventory().getArmorContents();
-                armors[3] = new ItemStack(Material.AIR);
-                p.getInventory().setArmorContents(armors);
-                wearers.remove(p.getUniqueId());
+                for (Player p : players) {
+                    ItemStack[] armors = p.getInventory().getArmorContents();
+                    armors[3] = new ItemStack(Material.AIR);
+                    p.getInventory().setArmorContents(armors);
+                    wearers.remove(p.getUniqueId());
+                }
+                break;
             }
         }
         return true;
@@ -100,7 +113,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
             case 1:
                 return Stream.of("set", "unset").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
             case 2:
-                return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
+                return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
             case 3:
                 if (args[0].equalsIgnoreCase("set")) {
                     return Arrays.stream(Face.values()).map(x -> x.label).filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
