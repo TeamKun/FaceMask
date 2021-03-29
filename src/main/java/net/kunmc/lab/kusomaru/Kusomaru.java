@@ -30,6 +30,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
 
     @Override
     public void onEnable() {
+        getDataFolder().mkdirs();
         saveDefaultConfig();
         FileConfiguration config = getConfig();
         KUSOMARU1 = Material.valueOf(config.getString("kusomaru1"));
@@ -50,7 +51,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         switch (args[0].toLowerCase()) {
             case "set": {
                 if (args.length < 3) {
-                    sender.sendMessage("Usage: /kusomaru set <player> <item>");
+                    sender.sendMessage("Usage: /kusomaru set <player> <facename>");
                     break;
                 }
 

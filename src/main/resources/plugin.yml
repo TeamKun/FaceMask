@@ -4,5 +4,5 @@ main: net.kunmc.lab.kusomaru.Kusomaru
 commands:
   kusomaru:
     usage: |-
-      /kusomaru set <player> <item>
+      /kusomaru set <player> <facename>
       /kusomaru unset <player>
