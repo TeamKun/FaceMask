@@ -85,7 +85,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
 
                 for (Player p : players) {
                     ItemStack[] armors = p.getInventory().getArmorContents();
-                    p.getInventory().addItem(armors[3]);
+                    if (armors[3] != null) p.getInventory().addItem(armors[3]);
                     armors[3] = item;
                     p.getInventory().setArmorContents(armors);
                     wearers.put(p.getUniqueId(), face);
