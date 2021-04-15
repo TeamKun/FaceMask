@@ -1,6 +1,7 @@
 name: Kusomaru
 version: ${project.version}
 main: net.kunmc.lab.kusomaru.Kusomaru
+api-version: 1.16
 commands:
   kusomaru:
     usage: |-

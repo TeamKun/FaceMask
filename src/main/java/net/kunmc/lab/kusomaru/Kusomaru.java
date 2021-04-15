@@ -16,6 +16,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -26,6 +27,8 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
     private static Material KUSOMARU1;
     private static Material KUSOMARU2;
     private static Material KUN;
+    private static Material CHUN;
+    private int CustomModelData = 256;
     private final HashMap<UUID, Face> wearers = new HashMap<>();
 
     @Override
@@ -36,13 +39,14 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         KUSOMARU1 = Material.valueOf(config.getString("kusomaru1"));
         KUSOMARU2 = Material.valueOf(config.getString("kusomaru2"));
         KUN = Material.valueOf(config.getString("kun"));
+        CHUN = Material.valueOf(config.getString("chun"));
+        CustomModelData = config.getInt("CustomModelData");
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginCommand("kusomaru").setExecutor(this);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         for (UUID uuid : wearers.keySet()) {
             Player p = Bukkit.getPlayer(uuid);
             if (p == null) continue;
@@ -74,13 +78,18 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                     sender.sendMessage(ChatColor.RED + facename + "は存在しません");
                     break;
                 }
-                Face item = Face.valueOf(facename);
+
+                Face face = Face.valueOf(facename);
+                ItemStack item = new ItemStack(face.material);
+                ItemMeta meta = item.getItemMeta();
+                meta.setCustomModelData(CustomModelData);
+                item.setItemMeta(meta);
+
                 for (Player p : players) {
                     ItemStack[] armors = p.getInventory().getArmorContents();
-                    armors[3] = new ItemStack(item.material);
-                    ;
+                    armors[3] = item;
                     p.getInventory().setArmorContents(armors);
-                    wearers.put(p.getUniqueId(), item);
+                    wearers.put(p.getUniqueId(), face);
                 }
                 break;
             }
@@ -156,7 +165,8 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
     private enum Face {
         kusomaru1("kusomaru1", KUSOMARU1),
         kusomaru2("kusomaru2", KUSOMARU2),
-        kun("kun", KUN);
+        kun("kun", KUN),
+        chun("chun", CHUN);
 
         private final String label;
         private final Material material;

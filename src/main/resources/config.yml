@@ -1,3 +1,5 @@
-kusomaru1: BLUE_GLAZED_TERRACOTTA
-kusomaru2: BLACK_GLAZED_TERRACOTTA
-kun: BROWN_GLAZED_TERRACOTTA
+kusomaru1: MAGENTA_DYE
+kusomaru2: LIME_DYE
+kun: PINK_DYE
+chun: GRAY_DYE
+CustomModelData: 256
