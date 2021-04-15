@@ -24,10 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandExecutor, Listener {
-    private static Material KUSOMARU1;
-    private static Material KUSOMARU2;
-    private static Material KUN;
-    private static Material CHUN;
+    private final Map<String, Face> Faces = new HashMap<>();
     private int CustomModelData = 256;
     private final HashMap<UUID, Face> wearers = new HashMap<>();
 
@@ -36,11 +33,12 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         getDataFolder().mkdirs();
         saveDefaultConfig();
         FileConfiguration config = getConfig();
-        KUSOMARU1 = Material.valueOf(config.getString("kusomaru1"));
-        KUSOMARU2 = Material.valueOf(config.getString("kusomaru2"));
-        KUN = Material.valueOf(config.getString("kun"));
-        CHUN = Material.valueOf(config.getString("chun"));
+        Map<String,String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
+        for (String key : faceRelations.keySet()) {
+            Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key))));
+        }
         CustomModelData = config.getInt("CustomModelData");
+
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginCommand("kusomaru").setExecutor(this);
     }
@@ -74,12 +72,12 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                 }
 
                 String facename = args[2].toLowerCase();
-                if (Arrays.stream(Face.values()).noneMatch(x -> x.label.equalsIgnoreCase(facename))) {
+                if (Faces.keySet().stream().noneMatch(x -> x.equalsIgnoreCase(facename))) {
                     sender.sendMessage(ChatColor.RED + facename + "は存在しません");
                     break;
                 }
 
-                Face face = Face.valueOf(facename);
+                Face face = Faces.get(facename);
                 ItemStack item = new ItemStack(face.material);
                 ItemMeta meta = item.getItemMeta();
                 meta.setCustomModelData(CustomModelData);
@@ -87,6 +85,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
 
                 for (Player p : players) {
                     ItemStack[] armors = p.getInventory().getArmorContents();
+                    p.getInventory().addItem(armors[3]);
                     armors[3] = item;
                     p.getInventory().setArmorContents(armors);
                     wearers.put(p.getUniqueId(), face);
@@ -125,7 +124,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
                 return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
             case 3:
                 if (args[0].equalsIgnoreCase("set")) {
-                    return Arrays.stream(Face.values()).map(x -> x.label).filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
+                    return Faces.keySet().stream().filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
                 }
             default:
                 return new ArrayList<>();
@@ -159,21 +158,6 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         if (wearers.containsKey(p.getUniqueId()) && e.getSlot() == 39) {
             e.setCancelled(true);
             p.closeInventory();
-        }
-    }
-
-    private enum Face {
-        kusomaru1("kusomaru1", KUSOMARU1),
-        kusomaru2("kusomaru2", KUSOMARU2),
-        kun("kun", KUN),
-        chun("chun", CHUN);
-
-        private final String label;
-        private final Material material;
-
-        Face(String label, Material material) {
-            this.label = label;
-            this.material = material;
         }
     }
 }

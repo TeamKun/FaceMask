@@ -1,5 +1,6 @@
-kusomaru1: MAGENTA_DYE
-kusomaru2: LIME_DYE
-kun: PINK_DYE
-chun: GRAY_DYE
+Faces:
+ - kusomaru1: MAGENTA_DYE
+   kusomaru2: LIME_DYE
+   kun: PINK_DYE
+   chun: GRAY_DYE
 CustomModelData: 256
