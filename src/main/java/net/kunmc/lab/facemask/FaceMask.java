@@ -80,6 +80,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                 Face face = Faces.get(facename);
                 ItemStack item = new ItemStack(face.material);
                 ItemMeta meta = item.getItemMeta();
+                meta.setDisplayName(facename);
                 meta.setCustomModelData(CustomModelData);
                 item.setItemMeta(meta);
 
