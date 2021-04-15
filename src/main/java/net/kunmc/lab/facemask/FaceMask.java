@@ -1,4 +1,4 @@
-package net.kunmc.lab.kusomaru;
+package net.kunmc.lab.facemask;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandExecutor, Listener {
+public final class FaceMask extends JavaPlugin implements TabCompleter, CommandExecutor, Listener {
     private final Map<String, Face> Faces = new HashMap<>();
     private int CustomModelData = 256;
     private final HashMap<UUID, Face> wearers = new HashMap<>();
@@ -40,7 +40,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         CustomModelData = config.getInt("CustomModelData");
 
         getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginCommand("kusomaru").setExecutor(this);
+        getServer().getPluginCommand("facemask").setExecutor(this);
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
         switch (args[0].toLowerCase()) {
             case "set": {
                 if (args.length < 3) {
-                    sender.sendMessage("Usage: /kusomaru set <player> <facename>");
+                    sender.sendMessage("Usage: /facemask set <player> <facename>");
                     break;
                 }
 
@@ -94,7 +94,7 @@ public final class Kusomaru extends JavaPlugin implements TabCompleter, CommandE
             }
             case "unset": {
                 if (args.length < 2) {
-                    sender.sendMessage("Usage: /kusomaru unset <player>");
+                    sender.sendMessage("Usage: /facemask unset <player>");
                     break;
                 }
 

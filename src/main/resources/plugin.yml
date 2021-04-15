@@ -1,9 +1,9 @@
-name: Kusomaru
+name: FaceMask
 version: ${project.version}
-main: net.kunmc.lab.kusomaru.Kusomaru
+main: net.kunmc.lab.facemask.FaceMask
 api-version: 1.16
 commands:
-  kusomaru:
+  facemask:
     usage: |-
-      /kusomaru set <player> <facename>
-      /kusomaru unset <player>
+      /facemask set <player> <facename>
+      /facemask unset <player>

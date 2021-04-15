@@ -1,4 +1,4 @@
-package net.kunmc.lab.kusomaru;
+package net.kunmc.lab.facemask;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
