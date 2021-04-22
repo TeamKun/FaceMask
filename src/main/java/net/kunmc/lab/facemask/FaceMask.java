@@ -138,18 +138,34 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                return Stream.of("set", "unset","get").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
-            case 2:
-                return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
-            case 3:
-                if (args[0].equalsIgnoreCase("set")) {
-                    return Faces.keySet().stream().filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
-                }
-            default:
-                return new ArrayList<>();
+        if (args.length == 1) {
+            return Stream.of("set", "unset", "get").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
         }
+
+        if (args.length == 2) {
+            switch (args[0]) {
+                case "set":
+                    return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
+                case "unset":
+                    return wearers.keySet().stream().map(x -> {
+                        Player p = Bukkit.getPlayer(x);
+                        if (p == null) {
+                            return "";
+                        }
+                        return p.getName();
+                    }).collect(Collectors.toList());
+                case "get":
+                    return Faces.keySet().stream().filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
+            }
+        }
+
+        if (args.length == 3) {
+            switch (args[0]) {
+                case "set":
+                    return Faces.keySet().stream().filter(x -> x.startsWith(args[2])).collect(Collectors.toList());
+            }
+        }
+        return new ArrayList<>();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
