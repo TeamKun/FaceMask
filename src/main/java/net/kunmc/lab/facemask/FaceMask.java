@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 public final class FaceMask extends JavaPlugin implements TabCompleter, CommandExecutor, Listener {
     private final Map<String, Face> Faces = new HashMap<>();
-    private int CustomModelData = 256;
+    private int CustomModelData;
     private final HashMap<UUID, Face> wearers = new HashMap<>();
 
     @Override
@@ -35,10 +35,10 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
         saveDefaultConfig();
         FileConfiguration config = getConfig();
         Map<String,String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
-        for (String key : faceRelations.keySet()) {
-            Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key))));
-        }
         CustomModelData = config.getInt("CustomModelData");
+        for (String key : faceRelations.keySet()) {
+            Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key)), CustomModelData));
+        }
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginCommand("facemask").setExecutor(this);
@@ -79,16 +79,10 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                 }
 
                 Face face = Faces.get(facename);
-                ItemStack item = new ItemStack(face.material);
-                ItemMeta meta = item.getItemMeta();
-                meta.setDisplayName(facename);
-                meta.setCustomModelData(CustomModelData);
-                item.setItemMeta(meta);
-
                 for (Player p : players) {
                     ItemStack[] armors = p.getInventory().getArmorContents();
                     if (armors[3] != null) p.getInventory().addItem(armors[3]);
-                    armors[3] = item;
+                    armors[3] = face;
                     p.getInventory().setArmorContents(armors);
                     wearers.put(p.getUniqueId(), face);
                 }
@@ -124,13 +118,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
 
-                Face face = Faces.get(facename);
-                ItemStack item = new ItemStack(face.material);
-                ItemMeta meta = item.getItemMeta();
-                meta.setDisplayName(facename);
-                meta.setCustomModelData(CustomModelData);
-                item.setItemMeta(meta);
-                ((Player) sender).getInventory().addItem(item);
+                ((Player) sender).getInventory().addItem(Faces.get(facename));
             }
         }
         return true;
@@ -175,7 +163,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
             ItemStack[] armors = p.getInventory().getArmorContents();
             armors[3] = new ItemStack(Material.AIR);
             p.getInventory().setArmorContents(armors);
-            e.getDrops().removeIf(x -> x.getType() == wearers.get(p.getUniqueId()).material);
+            e.getDrops().removeIf(x -> x.getType() == wearers.get(p.getUniqueId()).getType());
         }
     }
 
@@ -184,7 +172,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
         Player p = e.getPlayer();
         if (wearers.containsKey(p.getUniqueId())) {
             ItemStack[] armors = p.getInventory().getArmorContents();
-            armors[3] = new ItemStack(wearers.get(p.getUniqueId()).material);
+            armors[3] = new ItemStack(wearers.get(p.getUniqueId()).getType());
             p.getInventory().setArmorContents(armors);
         }
     }
