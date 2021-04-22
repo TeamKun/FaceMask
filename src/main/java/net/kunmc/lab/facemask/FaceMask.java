@@ -113,6 +113,25 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                 }
                 break;
             }
+            case "get":{
+                if (args.length < 2) {
+                    sender.sendMessage("Usage: /facemask get <player>");
+                    break;
+                }
+                String facename = args[1].toLowerCase();
+                if (Faces.keySet().stream().noneMatch(x -> x.equalsIgnoreCase(facename))) {
+                    sender.sendMessage(ChatColor.RED + facename + "は存在しません");
+                    break;
+                }
+
+                Face face = Faces.get(facename);
+                ItemStack item = new ItemStack(face.material);
+                ItemMeta meta = item.getItemMeta();
+                meta.setDisplayName(facename);
+                meta.setCustomModelData(CustomModelData);
+                item.setItemMeta(meta);
+                ((Player) sender).getInventory().addItem(item);
+            }
         }
         return true;
     }
@@ -121,7 +140,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         switch (args.length) {
             case 1:
-                return Stream.of("set", "unset").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
+                return Stream.of("set", "unset","get").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
             case 2:
                 return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
             case 3:

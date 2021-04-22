@@ -7,3 +7,4 @@ commands:
     usage: |-
       /facemask set <player> <facename>
       /facemask unset <player>
+      /facemask get <player>
