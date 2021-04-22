@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -155,7 +156,9 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent e) {
-        Player p = (Player) (e.getInventory().getHolder());
+        InventoryHolder holder = e.getInventory().getHolder();
+        if (!(holder instanceof Player)) return;
+        Player p = (Player) holder;
         if (wearers.containsKey(p.getUniqueId()) && e.getSlot() == 39) {
             e.setCancelled(true);
             p.closeInventory();
