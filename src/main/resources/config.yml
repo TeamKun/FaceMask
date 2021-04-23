@@ -3,4 +3,6 @@ Faces:
    kusomaru2: LIME_DYE
    kun: PINK_DYE
    chun: GRAY_DYE
+   samaru: WHITE_DYE
+   samaruCreature: BROWN_DYE
 CustomModelData: 256
