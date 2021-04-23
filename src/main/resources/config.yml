@@ -1,8 +1,9 @@
+#Facesのキー名は小文字で入力してください.
 Faces:
  - kusomaru1: MAGENTA_DYE
    kusomaru2: LIME_DYE
    kun: PINK_DYE
    chun: GRAY_DYE
    samaru: WHITE_DYE
-   samaruCreature: BROWN_DYE
+   samarucreature: BROWN_DYE
 CustomModelData: 256
