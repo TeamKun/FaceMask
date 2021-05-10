@@ -1,6 +1,7 @@
 #Facesのキー名は小文字で入力してください.
 Faces:
- - kusomaru1: MAGENTA_DYE
+ - kusomaru1: BLUE_DYE
+   kusomaru1_gray: MAGENTA_DYE
    kusomaru2: LIME_DYE
    kun: PINK_DYE
    chun: GRAY_DYE
