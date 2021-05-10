@@ -7,7 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,24 +19,33 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class FaceMask extends JavaPlugin implements TabCompleter, CommandExecutor, Listener {
     private final Map<String, Face> Faces = new HashMap<>();
-    private int CustomModelData;
     private final HashMap<UUID, Face> wearers = new HashMap<>();
+    private int CustomModelData;
 
     @Override
     public void onEnable() {
         getDataFolder().mkdirs();
         saveDefaultConfig();
-        FileConfiguration config = getConfig();
-        Map<String,String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
+        FileConfiguration config = null;
+        try {
+            config = fetchConfig(getConfig().getString("RemoteConfigURL"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            setEnabled(false);
+        }
+
+        Map<String, String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
         CustomModelData = config.getInt("CustomModelData");
         for (String key : faceRelations.keySet()) {
             Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key)), CustomModelData));
@@ -56,6 +67,14 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
         }
     }
 
+    public FileConfiguration fetchConfig(String spec) throws IOException, InvalidConfigurationException {
+        URL url = new URL(spec);
+        InputStreamReader in = new InputStreamReader(url.openStream());
+        FileConfiguration config = new YamlConfiguration();
+        config.load(in);
+        return config;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length < 1) return false;
@@ -66,7 +85,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
 
-                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player)x)).collect(Collectors.toList());
+                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player) x)).collect(Collectors.toList());
                 if (players.isEmpty()) {
                     sender.sendMessage(ChatColor.RED + "変更対象は存在しません.");
                     break;
@@ -94,7 +113,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                     break;
                 }
 
-                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player)x)).collect(Collectors.toList());
+                List<Player> players = Arrays.stream(Objects.requireNonNull(CommandUtils.getTargets(sender, args[1]))).filter(x -> x instanceof Player).map((x -> (Player) x)).collect(Collectors.toList());
                 if (players.isEmpty()) {
                     sender.sendMessage(ChatColor.RED + "変更対象は存在しません.");
                     break;
@@ -107,7 +126,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                 }
                 break;
             }
-            case "get":{
+            case "get": {
                 if (args.length < 2) {
                     sender.sendMessage("Usage: /facemask get <player>");
                     break;
@@ -133,7 +152,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
         if (args.length == 2) {
             switch (args[0]) {
                 case "set":
-                    return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName),Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
+                    return Stream.concat(Bukkit.getOnlinePlayers().stream().map(Player::getName), Stream.of("@a", "@a[distance=..")).filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
                 case "unset":
                     return wearers.keySet().stream().map(x -> {
                         Player p = Bukkit.getPlayer(x);
