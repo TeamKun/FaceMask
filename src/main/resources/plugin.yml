@@ -8,3 +8,4 @@ commands:
       /facemask set <player> <facename>
       /facemask unset <player>
       /facemask get <facename>
+      /facemask reload
