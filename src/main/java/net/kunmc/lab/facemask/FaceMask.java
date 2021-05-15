@@ -44,12 +44,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
             e.printStackTrace();
             setEnabled(false);
         }
-
-        Map<String, String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
-        CustomModelData = config.getInt("CustomModelData");
-        for (String key : faceRelations.keySet()) {
-            Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key)), CustomModelData));
-        }
+        setFaces(config);
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginCommand("facemask").setExecutor(this);
@@ -73,6 +68,14 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
         FileConfiguration config = new YamlConfiguration();
         config.load(in);
         return config;
+    }
+
+    public void setFaces(FileConfiguration config) {
+        Map<String, String> faceRelations = ((Map<String, String>) config.getMapList("Faces").get(0));
+        CustomModelData = config.getInt("CustomModelData");
+        for (String key : faceRelations.keySet()) {
+            Faces.put(key, new Face(key, Material.valueOf(faceRelations.get(key)), CustomModelData));
+        }
     }
 
     @Override
@@ -139,6 +142,16 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
 
                 ((Player) sender).getInventory().addItem(Faces.get(facename));
             }
+            case "reload": {
+                FileConfiguration config = null;
+                try {
+                    config = fetchConfig(getConfig().getString("RemoteConfigURL"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setEnabled(false);
+                }
+                setFaces(config);
+            }
         }
         return true;
     }
@@ -146,7 +159,7 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Stream.of("set", "unset", "get").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
+            return Stream.of("set", "unset", "get", "reload").filter(x -> x.startsWith(args[0])).collect(Collectors.toList());
         }
 
         if (args.length == 2) {
@@ -163,6 +176,8 @@ public final class FaceMask extends JavaPlugin implements TabCompleter, CommandE
                     }).collect(Collectors.toList());
                 case "get":
                     return Faces.keySet().stream().filter(x -> x.startsWith(args[1])).collect(Collectors.toList());
+                case "reload":
+                    return Collections.emptyList();
             }
         }
 
